@@ -1,10 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
+import Spinner from '@/components/Spinner';
 
 import { getNavLinks } from '@/helpers/web-base-helpers';
 
 async function SiteFooter() {
-  const navLinks = await getNavLinks();
 
   return (
     <header className="site-footer">
@@ -21,19 +21,9 @@ async function SiteFooter() {
       <div className="link-wrapper">
         <div className="col">
           <h2>Navigation</h2>
-          <nav>
-            <ol>
-              {navLinks.map(
-                ({ slug, label, href }) => (
-                  <li key={slug}>
-                    <Link href={href}>
-                      {label}
-                    </Link>
-                  </li>
-                )
-              )}
-            </ol>
-          </nav>
+          <React.Suspense fallback={<Spinner />}>
+            <Links />
+          </React.Suspense>
         </div>
         <div className="col">
           <h2>Legal</h2>
@@ -56,6 +46,27 @@ async function SiteFooter() {
       </div>
     </header>
   );
+}
+
+async function Links() {
+  let navLinks = await getNavLinks();
+
+  return (
+    <ol className="header-nav-links">
+      {navLinks.map(
+        ({ slug, label, href, type }) => (
+          <li key={slug}>
+            <Link
+              href={href}
+              className={`header-nav-link ${type}`}
+            >
+              {label}
+            </Link>
+          </li>
+        )
+      )}
+    </ol>
+  )
 }
 
 export default SiteFooter;
